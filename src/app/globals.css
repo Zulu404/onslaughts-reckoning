@@ -34,29 +34,36 @@ body {
   font-family: var(--font-cinzel, Georgia, serif);
 }
 
-/* Flame ring Discord button */
-@property --flame-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
+/* Discord button. A fire-coloured pill sits behind the opaque button so
+   only its rim shows, and the same turbulence that drives the logo warps
+   that rim into flames. The filter has to live on this separate layer:
+   filtering the wrapper would filter the button inside it too. */
+.flame-wrap {
+  position: relative;
+  display: inline-flex;
 }
 
-@keyframes flame-rotate {
-  to { --flame-angle: 360deg; }
-}
-
-.flame-ring {
-  padding: 2px;
+.flame-aura {
+  position: absolute;
+  inset: -5px;
   border-radius: 9999px;
-  background: conic-gradient(
-    from var(--flame-angle),
-    #ff2200, #ff6600, #ffcc00, #ff6600, #ff2200, #cc0000, #ff2200
+  background: linear-gradient(
+    180deg,
+    #ffd21e 0%,
+    #ff7a00 32%,
+    #ff2d00 64%,
+    #a81000 100%
   );
-  animation: flame-rotate 2s linear infinite;
-  box-shadow: 0 0 18px rgba(255, 80, 0, 0.7), 0 0 40px rgba(255, 40, 0, 0.35);
+  filter: url(#fire-btn);
+  pointer-events: none;
+}
+
+.flame-wrap:hover .flame-aura {
+  filter: url(#fire-btn) brightness(1.3);
 }
 
 .flame-btn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.65rem;
@@ -69,6 +76,7 @@ body {
   letter-spacing: 0.06em;
   text-decoration: none;
   white-space: nowrap;
+  box-shadow: 0 0 24px rgba(255, 80, 0, 0.3);
   transition: background 0.2s ease;
 }
 
@@ -104,12 +112,15 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flame-ring,
   .logo-halo {
     animation: none;
   }
 
   .logo-fire {
     display: none;
+  }
+
+  .flame-aura {
+    filter: none;
   }
 }

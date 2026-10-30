@@ -103,6 +103,42 @@ export default function Page() {
               yChannelSelector="G"
             />
           </filter>
+
+          {/* Same idea at button scale. No colour matrix: the aura behind
+              the button is already pure flame colour, so there is nothing
+              to isolate. Softened first so the warped rim reads as flame
+              rather than a torn edge. */}
+          <filter
+            id="fire-btn"
+            x="-30%"
+            y="-60%"
+            width="160%"
+            height="220%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.1" result="soft" />
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.09 0.035"
+              numOctaves={2}
+              seed={5}
+              result="btnNoise"
+            >
+              <animate
+                attributeName="baseFrequency"
+                dur="6s"
+                values="0.09 0.035; 0.115 0.045; 0.075 0.028; 0.09 0.035"
+                repeatCount="indefinite"
+              />
+            </feTurbulence>
+            <feDisplacementMap
+              in="soft"
+              in2="btnNoise"
+              scale={8}
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
         </defs>
       </svg>
     </main>

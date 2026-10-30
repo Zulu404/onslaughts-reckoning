@@ -10,7 +10,8 @@ function DiscordIcon() {
 
 export default function DiscordButton() {
   return (
-    <div className="flame-ring">
+    <div className="flame-wrap">
+      <span aria-hidden className="flame-aura" />
       <a
         href="https://discord.gg/mus9eEwXh"
         target="_blank"
