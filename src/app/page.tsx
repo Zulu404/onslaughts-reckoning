@@ -1,26 +1,21 @@
-import Image from "next/image";
-import FireCanvas from "@/components/FireCanvas";
 import DiscordButton from "@/components/DiscordButton";
 
 export default function Page() {
   return (
-    <div className="relative min-h-screen bg-black flex flex-col items-center justify-center gap-8 overflow-hidden px-6">
-      <FireCanvas />
-
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6 px-4">
       <div
-        className="relative z-10"
+        className="relative"
         style={{
-          filter:
-            "drop-shadow(0 0 40px rgba(220,60,0,0.7)) drop-shadow(0 0 80px rgba(180,30,0,0.4))",
+          filter: "drop-shadow(0 0 60px rgba(200,50,0,0.6)) drop-shadow(0 0 120px rgba(150,20,0,0.3))",
         }}
       >
-        <Image
-          src="/guild-logo.jpg"
-          alt="Onslaught's Reckoning"
-          width={480}
-          height={480}
-          priority
-          className="w-64 h-64 sm:w-80 sm:h-80 md:w-[420px] md:h-[420px] object-contain select-none"
+        <video
+          src="/logo-animated.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-72 h-72 sm:w-96 sm:h-96 md:w-[520px] md:h-[520px] object-contain select-none"
         />
       </div>
 
