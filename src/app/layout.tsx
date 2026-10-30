@@ -14,8 +14,29 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Onslaught's Reckoning",
-  description: "A World of Warcraft forever guild. We raid, we conquer, we endure.",
+  title: "Onslaught's Reckoning — EU PvP Guild",
+  description:
+    "A World of Warcraft forever guild on EU PvP. We raid, we conquer, we endure. Now recruiting.",
+  openGraph: {
+    title: "Onslaught's Reckoning",
+    description:
+      "A World of Warcraft forever guild on EU PvP. We raid, we conquer, we endure.",
+    type: "website",
+    images: [
+      {
+        url: "/logo.jpg",
+        width: 1253,
+        height: 1254,
+        alt: "Onslaught's Reckoning",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Onslaught's Reckoning",
+    description: "A World of Warcraft forever guild on EU PvP.",
+    images: ["/logo.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -25,7 +46,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${cinzel.variable} ${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-[#0a0a0f] text-stone-100 antialiased">
+      <body className="min-h-full flex flex-col bg-black text-stone-100 antialiased">
         {children}
       </body>
     </html>
