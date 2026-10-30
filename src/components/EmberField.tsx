@@ -142,9 +142,11 @@ export default function EmberField({
         a *= 0.55 + Math.sin(e.phase * 3.1) * 0.18;
         a = Math.max(0, Math.min(1, a));
 
+        // Green stays low so embers track the logo's hue range (3-18deg)
+        // instead of climbing into yellow.
         const heat = 1 - t;
-        const g = Math.round(70 + heat * 150);
-        const b = Math.round(heat * heat * 40);
+        const g = Math.round(20 + heat * 60);
+        const b = Math.round(heat * heat * 14);
         const radius = e.size * 3;
 
         const glow = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, radius);
