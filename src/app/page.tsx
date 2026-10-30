@@ -24,8 +24,16 @@ export default function Page() {
             width={1253}
             height={1254}
             priority
-            className="logo-flicker relative w-[min(80vmin,560px)] select-none"
+            className="relative w-[min(80vmin,560px)] select-none"
             style={{ mixBlendMode: "screen" }}
+          />
+          <Image
+            aria-hidden
+            alt=""
+            src="/logo.jpg"
+            width={1253}
+            height={1254}
+            className="logo-fire pointer-events-none absolute inset-0 h-full w-full select-none"
           />
         </div>
 
@@ -53,6 +61,54 @@ export default function Page() {
           <DiscordButton />
         </div>
       </div>
+
+      <svg aria-hidden focusable="false" className="absolute h-0 w-0">
+        <defs>
+          <filter
+            id="fire-anim"
+            x="-15%"
+            y="-15%"
+            width="130%"
+            height="130%"
+            colorInterpolationFilters="sRGB"
+          >
+            {/* Red weighted against green and blue: neutral greys cancel to
+                black, so only the saturated flames survive. */}
+            <feColorMatrix
+              in="SourceGraphic"
+              type="matrix"
+              values="1.4 -0.7 -0.7 0 0
+                      0.49 -0.245 -0.245 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="flames"
+            />
+            {/* High x / low y frequency stretches the noise vertically into
+                flame-shaped tongues rather than round blobs. */}
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.035 0.012"
+              numOctaves={2}
+              seed={11}
+              result="noise"
+            >
+              <animate
+                attributeName="baseFrequency"
+                dur="9s"
+                values="0.035 0.012; 0.045 0.016; 0.030 0.010; 0.035 0.012"
+                repeatCount="indefinite"
+              />
+            </feTurbulence>
+            <feDisplacementMap
+              in="flames"
+              in2="noise"
+              scale={14}
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
     </main>
   );
 }
