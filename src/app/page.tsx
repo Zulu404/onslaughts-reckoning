@@ -2,20 +2,20 @@ import DiscordButton from "@/components/DiscordButton";
 
 export default function Page() {
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center overflow-hidden">
-      <div className="relative flex items-center justify-center" style={{ marginBottom: "-8vmin" }}>
-        <video
-          src="/logo-animated.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-[90vmin] h-[90vmin] max-w-[700px] max-h-[700px] object-contain select-none"
-          style={{ mixBlendMode: "screen" }}
-        />
-      </div>
+    <div className="relative min-h-screen bg-black overflow-hidden">
+      <video
+        src="/logo-animated.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+        style={{ mixBlendMode: "screen" }}
+      />
 
-      <DiscordButton />
+      <div className="relative z-10 flex min-h-screen items-end justify-center pb-16">
+        <DiscordButton />
+      </div>
     </div>
   );
 }

@@ -40,15 +40,46 @@ body {
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
-/* Discord button */
-.discord-btn {
-  background: linear-gradient(135deg, #5865F2 0%, #4752c4 100%);
-  box-shadow: 0 0 24px rgba(88,101,242,0.5), 0 0 60px rgba(88,101,242,0.2);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+/* Flame ring Discord button */
+@property --flame-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
-.discord-btn:hover {
-  box-shadow: 0 0 40px rgba(88,101,242,0.85), 0 0 90px rgba(88,101,242,0.35);
-  transform: translateY(-2px);
+
+@keyframes flame-rotate {
+  to { --flame-angle: 360deg; }
+}
+
+.flame-ring {
+  padding: 2px;
+  border-radius: 9999px;
+  background: conic-gradient(
+    from var(--flame-angle),
+    #ff2200, #ff6600, #ffcc00, #ff6600, #ff2200, #cc0000, #ff2200
+  );
+  animation: flame-rotate 2s linear infinite;
+  box-shadow: 0 0 18px rgba(255, 80, 0, 0.7), 0 0 40px rgba(255, 40, 0, 0.35);
+}
+
+.flame-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: #000;
+  color: #fff;
+  border-radius: 9999px;
+  padding: 0.85rem 2rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.flame-btn:hover {
+  background: #111;
 }
 
 /* Subtle noise texture overlay */
