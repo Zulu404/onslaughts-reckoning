@@ -76,8 +76,48 @@ body {
   background: #111;
 }
 
+/* Irregular stops so the flicker never reads as a repeating cycle */
+@keyframes logo-flicker {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  6%  { filter: brightness(1.07) saturate(1.10); }
+  13% { filter: brightness(0.96) saturate(0.97); }
+  22% { filter: brightness(1.04) saturate(1.06); }
+  31% { filter: brightness(1.01) saturate(1); }
+  39% { filter: brightness(1.10) saturate(1.13); }
+  48% { filter: brightness(0.95) saturate(0.96); }
+  57% { filter: brightness(1.05) saturate(1.07); }
+  66% { filter: brightness(0.99) saturate(1); }
+  74% { filter: brightness(1.08) saturate(1.10); }
+  83% { filter: brightness(0.97) saturate(0.98); }
+  92% { filter: brightness(1.03) saturate(1.04); }
+}
+
+.logo-flicker {
+  animation: logo-flicker 4.3s ease-in-out infinite;
+}
+
+/* Halo sits at the artwork's fire ring, not its centre, so the dark
+   interior of the logo stays dark instead of being washed warm. */
+.logo-halo {
+  background: radial-gradient(
+    circle,
+    transparent 30%,
+    rgba(255, 90, 20, 0.16) 48%,
+    rgba(200, 40, 0, 0.09) 62%,
+    transparent 78%
+  );
+  animation: logo-halo 5.9s ease-in-out infinite;
+}
+
+@keyframes logo-halo {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.05); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .flame-ring {
+  .flame-ring,
+  .logo-flicker,
+  .logo-halo {
     animation: none;
   }
 }

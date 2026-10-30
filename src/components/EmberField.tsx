@@ -12,9 +12,20 @@ interface Ember {
   size: number;
   phase: number;
   drift: number;
+  fromLogo: boolean;
 }
 
-export default function EmberField() {
+interface Source {
+  cx: number;
+  cy: number;
+  r: number;
+}
+
+export default function EmberField({
+  sourceSelector,
+}: {
+  sourceSelector?: string;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -27,6 +38,24 @@ export default function EmberField() {
 
     let W = 0;
     let H = 0;
+    let source: Source | null = null;
+
+    const measureSource = () => {
+      if (!sourceSelector) return;
+      const el = document.querySelector(sourceSelector);
+      if (!el) {
+        source = null;
+        return;
+      }
+      const b = el.getBoundingClientRect();
+      source = b.width
+        ? {
+            cx: b.left + b.width / 2,
+            cy: b.top + b.height / 2,
+            r: Math.min(b.width, b.height) * 0.4,
+          }
+        : null;
+    };
 
     const resize = () => {
       W = window.innerWidth;
@@ -37,16 +66,18 @@ export default function EmberField() {
       canvas.style.width = `${W}px`;
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      measureSource();
     };
     resize();
     window.addEventListener("resize", resize);
+    window.addEventListener("load", measureSource);
 
     const embers: Ember[] = [];
     const targetCount = () => Math.round(Math.min(W, 1800) / 7);
 
     // Cubed random keeps most embers small, so the field reads as sparks
     // rather than the soft blobs a uniform distribution produces.
-    function spawn(fromBottom: boolean) {
+    function spawnAmbient(fromBottom: boolean) {
       const size = 0.6 + Math.pow(Math.random(), 3) * 3.4;
       embers.push({
         x: Math.random() * W,
@@ -58,10 +89,28 @@ export default function EmberField() {
         size,
         phase: Math.random() * Math.PI * 2,
         drift: 0.2 + Math.random() * 0.5,
+        fromLogo: false,
       });
     }
 
-    for (let i = 0, n = targetCount(); i < n; i++) spawn(false);
+    function spawnSpark(s: Source) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = s.r * (0.85 + Math.random() * 0.3);
+      embers.push({
+        x: s.cx + Math.cos(angle) * radius,
+        y: s.cy + Math.sin(angle) * radius,
+        vx: Math.cos(angle) * 0.12 + (Math.random() - 0.5) * 0.2,
+        vy: -(0.5 + Math.random() * 1.1),
+        life: 0,
+        maxLife: 90 + Math.random() * 130,
+        size: 0.5 + Math.pow(Math.random(), 3) * 1.8,
+        phase: Math.random() * Math.PI * 2,
+        drift: 0.25 + Math.random() * 0.5,
+        fromLogo: true,
+      });
+    }
+
+    for (let i = 0, n = targetCount(); i < n; i++) spawnAmbient(false);
 
     let raf = 0;
 
@@ -69,8 +118,9 @@ export default function EmberField() {
       ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = "lighter";
 
-      const target = targetCount();
-      while (embers.length < target) spawn(true);
+      if (source && Math.random() < 0.4) spawnSpark(source);
+
+      let ambient = 0;
 
       for (let i = embers.length - 1; i >= 0; i--) {
         const e = embers[i];
@@ -80,6 +130,7 @@ export default function EmberField() {
           embers.splice(i, 1);
           continue;
         }
+        if (!e.fromLogo) ambient++;
 
         const t = e.life / e.maxLife;
         e.phase += 0.015;
@@ -107,6 +158,8 @@ export default function EmberField() {
         ctx.fill();
       }
 
+      for (let n = targetCount(); ambient < n; ambient++) spawnAmbient(true);
+
       ctx.globalCompositeOperation = "source-over";
       raf = requestAnimationFrame(frame);
     };
@@ -116,8 +169,9 @@ export default function EmberField() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("load", measureSource);
     };
-  }, []);
+  }, [sourceSelector]);
 
   return (
     <canvas
