@@ -8,7 +8,7 @@ export default function Page() {
       <EmberField />
 
       <h1 className="sr-only">
-        Onslaught&apos;s Reckoning — EU PvP World of Warcraft Guild
+        Onslaught&apos;s Reckoning — EU Horde PvP guild for WoW Forever
       </h1>
 
       <div className="relative z-10 flex flex-col items-center">
@@ -27,18 +27,22 @@ export default function Page() {
         </p>
 
         <div className="mt-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-stone-400 sm:gap-4 sm:text-xs">
+          <span>Horde</span>
+          <span aria-hidden className="text-orange-700/70">
+            &bull;
+          </span>
+          <span>PvP Ruleset</span>
+          <span aria-hidden className="text-orange-700/70">
+            &bull;
+          </span>
           <span>EU</span>
-          <span aria-hidden className="text-orange-700/70">
-            &bull;
-          </span>
-          <span>PvP Realm</span>
-          <span aria-hidden className="text-orange-700/70">
-            &bull;
-          </span>
-          <span className="text-amber-300/90">Now Recruiting</span>
         </div>
 
-        <div className="mt-11">
+        <p className="mt-4 text-center text-[11px] tracking-[0.12em] text-amber-200/70 sm:text-xs">
+          Recruiting for launch &mdash; everyone starts at level 1
+        </p>
+
+        <div className="mt-10">
           <DiscordButton />
         </div>
       </div>

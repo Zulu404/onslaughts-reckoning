@@ -14,13 +14,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Onslaught's Reckoning — EU PvP Guild",
+  title: "Onslaught's Reckoning — EU Horde PvP Guild",
   description:
-    "A World of Warcraft forever guild on EU PvP. We raid, we conquer, we endure. Now recruiting.",
+    "An EU Horde guild on the PvP ruleset for WoW Forever. We raid, we conquer, we endure. Recruiting now for launch.",
   openGraph: {
     title: "Onslaught's Reckoning",
     description:
-      "A World of Warcraft forever guild on EU PvP. We raid, we conquer, we endure.",
+      "An EU Horde guild on the PvP ruleset for WoW Forever. Recruiting now for launch.",
     type: "website",
     images: [
       {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Onslaught's Reckoning",
-    description: "A World of Warcraft forever guild on EU PvP.",
+    description: "An EU Horde guild on the PvP ruleset for WoW Forever.",
     images: ["/logo.jpg"],
   },
 };
