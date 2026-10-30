@@ -37,11 +37,7 @@ export default function Page() {
           />
         </div>
 
-        <p className="font-display -mt-4 text-center text-base uppercase tracking-[0.22em] text-amber-200/85 sm:-mt-6 sm:text-xl">
-          We raid. We conquer. We endure.
-        </p>
-
-        <div className="mt-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-stone-400 sm:gap-4 sm:text-xs">
+        <div className="-mt-4 flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-stone-400 sm:-mt-6 sm:gap-4 sm:text-xs">
           <span>Horde</span>
           <span aria-hidden className="text-orange-700/70">
             &bull;
@@ -53,8 +49,8 @@ export default function Page() {
           <span>EU</span>
         </div>
 
-        <p className="mt-4 text-center text-[11px] tracking-[0.12em] text-amber-200/70 sm:text-xs">
-          Recruiting for launch &mdash; everyone starts at level 1
+        <p className="font-display mt-5 text-center text-sm uppercase tracking-[0.3em] text-amber-200/90 sm:text-base">
+          Now Recruiting
         </p>
 
         <div className="mt-10">

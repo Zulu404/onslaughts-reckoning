@@ -16,11 +16,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Onslaught's Reckoning — EU Horde PvP Guild",
   description:
-    "An EU Horde guild on the PvP ruleset for WoW Forever. We raid, we conquer, we endure. Recruiting now for launch.",
+    "An EU Horde guild on the PvP ruleset for WoW Forever. Now recruiting.",
   openGraph: {
     title: "Onslaught's Reckoning",
     description:
-      "An EU Horde guild on the PvP ruleset for WoW Forever. Recruiting now for launch.",
+      "An EU Horde guild on the PvP ruleset for WoW Forever. Now recruiting.",
     type: "website",
     images: [
       {
