@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
-import DiscordLink from "@/components/DiscordLink";
+import { DISCORD_INVITE, DiscordIcon } from "@/components/DiscordLink";
 import SidebarUser, { SidebarUserFallback } from "./SidebarUser";
 import NavLink from "./NavLink";
 import { GUILD_PAGES } from "./nav-config";
@@ -46,8 +46,20 @@ export default function HubShell({ children }: { children: ReactNode }) {
           </div>
         </nav>
 
-        <div className="mt-auto border-t border-stone-900/80 p-3">
-          <DiscordLink className="w-full !px-3 !py-2 !text-xs" />
+        {/* Deliberately not a button and not in the nav above: signing in with
+            Discord does not join the guild's server, so the link has to stay
+            reachable from inside the site, but it is a destination elsewhere
+            rather than a page of this one. */}
+        <div className="mt-auto border-t border-stone-900/80 px-3 py-3">
+          <a
+            href={DISCORD_INVITE}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-xs text-stone-600 transition-colors hover:text-stone-300"
+          >
+            <DiscordIcon size={14} />
+            Discord server
+          </a>
         </div>
       </aside>
 
