@@ -70,7 +70,7 @@ function Fields({
             minLength={2}
             maxLength={24}
             autoComplete="off"
-            placeholder="Wolfstride"
+            placeholder="Bio"
           />
         </div>
 
@@ -84,7 +84,7 @@ function Fields({
             className="field"
             maxLength={24}
             autoComplete="off"
-            placeholder="Spinebreaker"
+            placeholder="SpiritHealer"
           />
         </div>
 

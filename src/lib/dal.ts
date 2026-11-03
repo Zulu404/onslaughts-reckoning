@@ -100,26 +100,3 @@ export const getRoster = cache(async (): Promise<RosterEntry[]> => {
 
   return (data as RosterEntry[] | null) ?? [];
 });
-
-export interface Applicant extends Member {
-  characters: Character[];
-}
-
-/** Officer view. Returns empty for anyone who is not an officer: the row level
- *  security policies filter it, so this is not relying on the UI to hide it. */
-export const getApplicants = cache(async (): Promise<Applicant[]> => {
-  const member = await getMember();
-  if (!member?.is_officer) return [];
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("members")
-    .select(
-      "id, discord_id, discord_username, discord_avatar, status, is_officer, officer_note, created_at, characters(*)",
-    )
-    .order("created_at", { ascending: true });
-
-  if (error) console.error("[dal.getApplicants]", error.message);
-
-  return (data as Applicant[] | null) ?? [];
-});

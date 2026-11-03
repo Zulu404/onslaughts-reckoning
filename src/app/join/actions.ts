@@ -23,7 +23,6 @@ const MAX_PROFESSIONS = 2;
 function refresh() {
   revalidatePath("/join");
   revalidatePath("/roster");
-  revalidatePath("/officers");
 }
 
 export async function addCharacter(

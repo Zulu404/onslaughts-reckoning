@@ -73,7 +73,6 @@ export default async function SidebarUser() {
             altCount > 0 ? `My Characters (${characters.length})` : "My Characters"
           }
         />
-        {member.is_officer && <NavLink href="/officers" label="Officers" />}
       </div>
 
       <form action={signOut} className="mt-1 px-2">

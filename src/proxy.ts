@@ -50,7 +50,6 @@ export const config = {
     "/",
     "/join/:path*",
     "/roster/:path*",
-    "/officers/:path*",
     "/auth/:path*",
   ],
 };
