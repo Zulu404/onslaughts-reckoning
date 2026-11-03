@@ -14,6 +14,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  // Without this, relative Open Graph image URLs resolve against localhost.
+  metadataBase: new URL("https://onslaughtsreckoning.com"),
   title: "Onslaught's Reckoning — EU Horde PvP Guild",
   description:
     "An EU Horde guild on the PvP ruleset for WoW Forever. Now recruiting.",

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import EmberField from "@/components/EmberField";
 import DiscordButton from "@/components/DiscordButton";
 
@@ -55,6 +56,22 @@ export default function Page() {
 
         <div className="mt-10">
           <DiscordButton />
+        </div>
+
+        {/* Kept as quiet text so the button stays the single focal point. */}
+        <div className="mt-7 flex items-center gap-4 text-[11px] uppercase tracking-[0.2em] text-stone-500">
+          <Link href="/join" className="transition-colors hover:text-amber-200">
+            Register
+          </Link>
+          <span aria-hidden className="text-orange-900/80">
+            &bull;
+          </span>
+          <Link
+            href="/roster"
+            className="transition-colors hover:text-amber-200"
+          >
+            Roster
+          </Link>
         </div>
       </div>
 
