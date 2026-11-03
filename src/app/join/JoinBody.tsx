@@ -3,6 +3,7 @@ import CharacterBadge from "@/components/wow/CharacterBadge";
 import { getMember, getMyCharacters, getUser, type Character } from "@/lib/dal";
 import { authConfigured } from "@/lib/supabase/config";
 import { signInWithDiscord } from "@/app/auth/actions";
+import { DISCORD_INVITE } from "@/components/DiscordLink";
 import CharacterForm from "./CharacterForm";
 import { deleteCharacter, setMainCharacter } from "./actions";
 
@@ -14,16 +15,16 @@ const ERRORS: Record<string, string> = {
   profile: "You're signed in, but we couldn't create your profile.",
 };
 
+/**
+ * Only the exceptional states get a banner. Registration no longer needs an
+ * officer to approve it, so the ordinary accepted case says nothing rather
+ * than showing a reassurance panel on every visit.
+ */
 const STATUS_COPY = {
   pending: {
-    title: "Application received",
-    body: "An officer will review your characters and get back to you on Discord.",
+    title: "Awaiting review",
+    body: "An officer will take a look and get back to you on Discord.",
     tone: "border-amber-700/50 bg-amber-950/30 text-amber-100",
-  },
-  accepted: {
-    title: "You're in",
-    body: "Your characters appear on the public roster. Keep them up to date here.",
-    tone: "border-emerald-800/50 bg-emerald-950/30 text-emerald-100",
   },
   rejected: {
     title: "Not accepted",
@@ -90,38 +91,40 @@ export default async function JoinBody({
 
   const main = characters.find((c) => c.is_main);
   const alts = characters.filter((c) => !c.is_main);
+  const banner =
+    member && member.status !== "accepted"
+      ? STATUS_COPY[member.status]
+      : null;
+
+  if (!authConfigured) {
+    return (
+      <div className="panel p-6">
+        <p className="text-stone-300">
+          Character registration is being set up and will open shortly. In the
+          meantime, join us on Discord.
+        </p>
+        <a
+          href={DISCORD_INVITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-ember mt-5"
+        >
+          Join Our Discord
+        </a>
+      </div>
+    );
+  }
 
   return (
     <>
-      {/* Inside the boundary because the wording depends on the session. */}
-      <h1 className="font-display text-2xl uppercase tracking-[0.18em] text-amber-200/90">
-        {member ? "Your Characters" : "Register"}
-      </h1>
-
       {error && ERRORS[error] && (
-        <p className="mt-4 rounded border border-red-900/60 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+        <p className="mb-4 rounded border border-red-900/60 bg-red-950/40 px-4 py-3 text-sm text-red-200">
           {ERRORS[error]}
         </p>
       )}
 
-      {/* Supabase not configured yet: the landing page stays live regardless. */}
-      {!authConfigured ? (
-        <div className="panel mt-6 p-6">
-          <p className="text-stone-300">
-            Character registration is being set up and will open shortly. In the
-            meantime, join us on Discord.
-          </p>
-          <a
-            href="https://discord.gg/mus9eEwXh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-ember mt-5"
-          >
-            Join Our Discord
-          </a>
-        </div>
-      ) : !user ? (
-        <div className="panel mt-6 p-6">
+      {!user ? (
+        <div className="panel p-6">
           <p className="text-stone-300">
             Sign in with Discord to register your main and any alts you plan to
             roll. We use Discord so officers know who to contact.
@@ -136,7 +139,7 @@ export default async function JoinBody({
           </p>
         </div>
       ) : !member ? (
-        <div className="panel mt-6 p-6">
+        <div className="panel p-6">
           <p className="text-stone-300">
             You&apos;re signed in, but your profile hasn&apos;t been created
             yet. Try signing in again, and tell an officer if it keeps
@@ -150,32 +153,20 @@ export default async function JoinBody({
         </div>
       ) : (
         <>
-          <div
-            className={`mt-6 rounded-lg border px-4 py-3 ${STATUS_COPY[member.status].tone}`}
-          >
-            <p className="text-sm font-semibold">
-              {STATUS_COPY[member.status].title}
-            </p>
-            <p className="mt-0.5 text-sm opacity-90">
-              {STATUS_COPY[member.status].body}
-            </p>
-            {member.officer_note && (
-              <p className="mt-2 text-sm italic opacity-80">
-                Officer note: {member.officer_note}
-              </p>
-            )}
-          </div>
-
-          <p className="mt-4 text-sm text-stone-500">
-            Signed in as{" "}
-            <span className="text-stone-300">
-              {member.discord_username ?? "your Discord account"}
-            </span>
-            .
-          </p>
+          {banner && (
+            <div className={`mb-6 rounded-lg border px-4 py-3 ${banner.tone}`}>
+              <p className="text-sm font-semibold">{banner.title}</p>
+              <p className="mt-0.5 text-sm opacity-90">{banner.body}</p>
+              {member.officer_note && (
+                <p className="mt-2 text-sm italic opacity-80">
+                  Officer note: {member.officer_note}
+                </p>
+              )}
+            </div>
+          )}
 
           {characters.length > 0 && (
-            <section className="panel mt-6 p-5">
+            <section className="panel p-5">
               <h2 className="label">Main</h2>
               <ul className="mt-1">
                 {main ? (

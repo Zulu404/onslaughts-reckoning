@@ -66,6 +66,10 @@ body {
 
 .flame-btn {
   position: relative;
+  /* Also used as a <button> for the sign-in form, which needs these resets. */
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
   display: flex;
   align-items: center;
   gap: 0.65rem;

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import SiteHeader from "@/components/SiteHeader";
+import HubShell, { PageTitle } from "@/components/hub/HubShell";
 import RosterBody from "./RosterBody";
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 function RosterSkeleton() {
   return (
-    <div aria-hidden className="panel mt-6 space-y-3 p-5">
+    <div aria-hidden className="panel space-y-3 p-5">
       {[85, 70, 78, 60].map((w, i) => (
         <div
           key={i}
@@ -25,20 +25,15 @@ function RosterSkeleton() {
 
 export default function RosterPage() {
   return (
-    <>
-      <SiteHeader />
-
-      <main className="mx-auto max-w-3xl px-5 py-10">
+    <HubShell>
+      <main className="mx-auto max-w-3xl px-5 py-8">
         {/* Heading is static and prerenders; only the roster data streams. */}
-        <h1 className="font-display text-2xl uppercase tracking-[0.18em] text-amber-200/90">
-          Roster
-        </h1>
-        <p className="mt-2 text-sm text-stone-400">EU · Horde · PvP ruleset</p>
+        <PageTitle subtitle="EU · Horde · PvP ruleset">Roster</PageTitle>
 
         <Suspense fallback={<RosterSkeleton />}>
           <RosterBody />
         </Suspense>
       </main>
-    </>
+    </HubShell>
   );
 }

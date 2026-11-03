@@ -11,7 +11,10 @@ create table if not exists public.members (
   discord_id       text not null unique,
   discord_username text,
   discord_avatar   text,
-  status           text not null default 'pending'
+  -- Defaults to accepted: the guild is not vetting applications yet, so
+  -- registering puts you straight on the roster. The column and the officer
+  -- tooling remain so approval can be switched back on without a migration.
+  status           text not null default 'accepted'
                      check (status in ('pending', 'accepted', 'rejected')),
   is_officer       boolean not null default false,
   officer_note     text,
@@ -103,7 +106,7 @@ begin
   -- See guard_member_update: only constrain real end users.
   if auth.uid() is not null then
     new.is_officer   := false;
-    new.status       := 'pending';
+    new.status       := 'accepted';
     new.officer_note := null;
   end if;
   return new;

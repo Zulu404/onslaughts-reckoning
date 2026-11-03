@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { authConfigured } from "@/lib/supabase/config";
 import { siteOrigin } from "@/lib/site";
+import { RETURNING_COOKIE } from "@/app/HomeCta";
 
 /**
  * Discord sends the player back here with a one-time code. We trade it for a
@@ -65,5 +66,17 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/join`);
+  const response = NextResponse.redirect(`${origin}/join`);
+
+  // Remembers that this browser has an account, so the landing page can say
+  // "Log In" instead of "Register" next time. Not used for any authorization.
+  response.cookies.set(RETURNING_COOKIE, "1", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: origin.startsWith("https://"),
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+
+  return response;
 }

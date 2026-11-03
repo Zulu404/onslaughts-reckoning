@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import SiteHeader from "@/components/SiteHeader";
+import HubShell, { PageTitle } from "@/components/hub/HubShell";
 import { getMember } from "@/lib/dal";
 import OfficersBody from "./OfficersBody";
 
@@ -23,16 +23,11 @@ export default async function OfficersPage() {
   if (!me?.is_officer) notFound();
 
   return (
-    <>
-      <SiteHeader />
-
-      <main className="mx-auto max-w-3xl px-5 py-10">
-        <h1 className="font-display text-2xl uppercase tracking-[0.18em] text-amber-200/90">
-          Officers
-        </h1>
-
+    <HubShell>
+      <main className="mx-auto max-w-3xl px-5 py-8">
+        <PageTitle>Officers</PageTitle>
         <OfficersBody />
       </main>
-    </>
+    </HubShell>
   );
 }

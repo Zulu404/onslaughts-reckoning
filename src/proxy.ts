@@ -41,8 +41,16 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-// Only the routes that actually read a session. Matching everything added a
-// Supabase round-trip to the static landing page, which reads no session at all.
+// Only the routes that actually read a session, rather than every request.
+// "/" is included because the landing page now picks its primary call to
+// action from the session: without a refresh here, a member whose token had
+// expired would be shown "Log In" despite still being signed in.
 export const config = {
-  matcher: ["/join/:path*", "/roster/:path*", "/officers/:path*", "/auth/:path*"],
+  matcher: [
+    "/",
+    "/join/:path*",
+    "/roster/:path*",
+    "/officers/:path*",
+    "/auth/:path*",
+  ],
 };
