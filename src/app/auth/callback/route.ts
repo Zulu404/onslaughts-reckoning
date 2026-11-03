@@ -28,7 +28,17 @@ export async function GET(request: Request) {
   const meta = data.user.user_metadata ?? {};
   const discordId = (meta.provider_id ?? meta.sub ?? "") as string;
 
-  if (discordId) {
+  // Without a Discord id there is no stable key for the member row, and
+  // retrying would loop silently, so this has to surface as an error.
+  if (!discordId) {
+    console.error("[auth/callback] no Discord id in user_metadata", {
+      userId: data.user.id,
+      metadataKeys: Object.keys(meta),
+    });
+    return NextResponse.redirect(`${origin}/join?error=profile`);
+  }
+
+  {
     // global_name is Discord's current display name; full_name/name are the
     // older fields, kept as fallbacks for accounts that predate the change.
     const username = (meta.custom_claims?.global_name ??

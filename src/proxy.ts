@@ -41,8 +41,8 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
+// Only the routes that actually read a session. Matching everything added a
+// Supabase round-trip to the static landing page, which reads no session at all.
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|wow/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|mp4|woff2?)$).*)",
-  ],
+  matcher: ["/join/:path*", "/roster/:path*", "/officers/:path*", "/auth/:path*"],
 };

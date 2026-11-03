@@ -66,8 +66,13 @@ Locally, create `.env.local` in the repository root (it is gitignored):
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon or publishable key>
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
+
+`NEXT_PUBLIC_SITE_URL` must be `https://onslaughtsreckoning.com` in production.
+It is the authoritative public origin for OAuth redirects, so they never depend
+on proxy headers a client could tamper with.
 
 On Hostinger, set the same two variables in the Node.js app's environment. They
 are inlined at build time, so **a new build is required** after setting them —
@@ -75,14 +80,23 @@ pushing a commit triggers one.
 
 ## 7. Make yourself an officer
 
-Sign in through the site once so your row exists, then run this in the SQL
-editor with your own Discord username:
+Sign in through the site once so your row exists, then list the members in the
+SQL editor:
+
+```sql
+select id, discord_id, discord_username from public.members;
+```
+
+Find your row, then promote it by its Discord id:
 
 ```sql
 update public.members
    set is_officer = true, status = 'accepted'
- where discord_username = 'your_discord_name';
+ where discord_id = '<your discord_id>';
 ```
+
+Use `discord_id`, not `discord_username` — the username is nullable and not
+unique, so matching on it can promote nobody, or two people at once.
 
 The schema deliberately blocks this from the application, so the SQL editor is
 the only way to create the first officer. After that, officers accept everyone

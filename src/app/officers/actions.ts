@@ -16,17 +16,20 @@ export async function setStatus(
   const me = await getMember();
   if (!me?.is_officer) return;
 
+  // Always sent as a string, including empty, so clearing the box clears the
+  // note. Passing null instead would make an existing note unremovable.
   const note = formData ? String(formData.get("note") ?? "").trim() : "";
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("set_member_status", {
     p_member_id: memberId,
     p_status: status,
-    p_note: note || null,
+    p_note: note,
   });
 
-  if (error) console.error("[setStatus]", error);
+  if (error) console.error("[setStatus]", error.message);
 
   revalidatePath("/officers");
   revalidatePath("/roster");
+  revalidatePath("/join");
 }

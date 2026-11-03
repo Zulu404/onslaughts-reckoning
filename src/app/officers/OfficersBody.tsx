@@ -1,6 +1,5 @@
-import { notFound } from "next/navigation";
 import CharacterBadge from "@/components/wow/CharacterBadge";
-import { getApplicants, getMember, type Applicant } from "@/lib/dal";
+import { getApplicants, type Applicant } from "@/lib/dal";
 import { setStatus } from "./actions";
 
 const STATUS_STYLE: Record<string, string> = {
@@ -78,38 +77,43 @@ function ApplicantCard({ applicant }: { applicant: Applicant }) {
         </p>
       )}
 
-      <form
-        action={setStatus.bind(
-          null,
-          applicant.id,
-          applicant.status === "accepted" ? "rejected" : "accepted",
-        )}
-        className="mt-4 flex flex-wrap items-center gap-3"
-      >
+      {/* Accept and reject are separate buttons sharing the note field. A
+          single toggle made rejecting a pending applicant impossible without
+          first accepting them, which would publish them to the public roster. */}
+      <form className="mt-4 flex flex-wrap items-center gap-3">
         <input
           name="note"
           className="field sm:max-w-xs"
           placeholder="Note for the applicant (optional)"
           maxLength={280}
+          defaultValue={applicant.officer_note ?? ""}
         />
-        <button
-          type="submit"
-          className={`btn ${
-            applicant.status === "accepted" ? "btn-ghost" : "btn-ember"
-          }`}
-        >
-          {applicant.status === "accepted" ? "Revoke" : "Accept"}
-        </button>
+        {applicant.status !== "accepted" && (
+          <button
+            type="submit"
+            formAction={setStatus.bind(null, applicant.id, "accepted")}
+            className="btn btn-ember"
+          >
+            Accept
+          </button>
+        )}
+        {applicant.status !== "rejected" && (
+          <button
+            type="submit"
+            formAction={setStatus.bind(null, applicant.id, "rejected")}
+            className="btn btn-ghost"
+          >
+            {applicant.status === "accepted" ? "Revoke" : "Reject"}
+          </button>
+        )}
       </form>
     </section>
   );
 }
 
 export default async function OfficersBody() {
-  const me = await getMember();
-  // 404 rather than redirect, so the page's existence isn't advertised.
-  if (!me?.is_officer) notFound();
-
+  // page.tsx gates access before anything renders; getApplicants() is also
+  // filtered by row level security, so this is defence in depth, not the gate.
   const applicants = await getApplicants();
   const pending = applicants.filter((a) => a.status === "pending");
   const decided = applicants.filter((a) => a.status !== "pending");

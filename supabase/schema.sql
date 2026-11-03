@@ -72,7 +72,12 @@ create or replace function public.guard_member_update()
   set search_path = public, pg_temp
 as $$
 begin
-  if not public.is_officer() then
+  -- auth.uid() is NULL only on a trusted connection (the SQL editor or the
+  -- service role). An end user always has one, and row level security already
+  -- blocks anonymous updates, so gating on it keeps the first-officer
+  -- bootstrap at the end of this file working. Checking unconditionally made
+  -- that UPDATE silently revert, leaving the guild with no officers at all.
+  if auth.uid() is not null and not public.is_officer() then
     new.is_officer   := old.is_officer;
     new.status       := old.status;
     new.officer_note := old.officer_note;
@@ -95,9 +100,12 @@ create or replace function public.guard_member_insert()
   set search_path = public, pg_temp
 as $$
 begin
-  new.is_officer   := false;
-  new.status       := 'pending';
-  new.officer_note := null;
+  -- See guard_member_update: only constrain real end users.
+  if auth.uid() is not null then
+    new.is_officer   := false;
+    new.status       := 'pending';
+    new.officer_note := null;
+  end if;
   return new;
 end;
 $$;
@@ -214,7 +222,11 @@ begin
 
   update public.members
      set status       = p_status,
-         officer_note = coalesce(p_note, officer_note)
+         -- An empty string clears the note; only NULL leaves it untouched.
+         officer_note = case
+                          when p_note is null then officer_note
+                          else nullif(btrim(p_note), '')
+                        end
    where id = p_member_id;
 end;
 $$;
@@ -289,8 +301,13 @@ grant select on public.roster to anon, authenticated;
 -- Sign in through the site once, then run this with your own Discord username
 -- to give yourself the officer view:
 --
+--   select id, discord_id, discord_username from public.members;
+--
 --   update public.members set is_officer = true, status = 'accepted'
---    where discord_username = 'your_discord_name';
+--    where discord_id = '<your discord_id from that list>';
+--
+-- Keyed on discord_id because discord_username is nullable and not unique, so
+-- it can silently match nobody, or two people at once.
 --
 -- The guard trigger above deliberately blocks this from the application, so
 -- the SQL editor is the only way in. After that, officers accept everyone else

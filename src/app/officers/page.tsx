@@ -1,7 +1,7 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
-import PanelSkeleton from "@/components/PanelSkeleton";
+import { getMember } from "@/lib/dal";
 import OfficersBody from "./OfficersBody";
 
 export const metadata: Metadata = {
@@ -9,7 +9,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function OfficersPage() {
+/**
+ * Deliberately not an instant route. The officer check has to run before any
+ * markup is flushed, otherwise notFound() cannot set a 404 status and a
+ * non-officer gets 200 plus the page heading. Instant navigation is worth
+ * nothing on an officer-only page anyway.
+ */
+export const instant = false;
+
+export default async function OfficersPage() {
+  const me = await getMember();
+  // 404 rather than redirect, so the page's existence isn't advertised.
+  if (!me?.is_officer) notFound();
+
   return (
     <>
       <SiteHeader />
@@ -19,9 +31,7 @@ export default function OfficersPage() {
           Officers
         </h1>
 
-        <Suspense fallback={<PanelSkeleton rows={4} />}>
-          <OfficersBody />
-        </Suspense>
+        <OfficersBody />
       </main>
     </>
   );
