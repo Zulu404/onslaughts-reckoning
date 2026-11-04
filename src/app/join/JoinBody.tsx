@@ -5,7 +5,7 @@ import { authConfigured } from "@/lib/supabase/config";
 import { signInWithDiscord } from "@/app/auth/actions";
 import { DISCORD_INVITE } from "@/components/DiscordLink";
 import CharacterForm from "./CharacterForm";
-import { deleteCharacter, setMainCharacter } from "./actions";
+import { deleteCharacter, renameCharacter, setMainCharacter } from "./actions";
 
 const ERRORS: Record<string, string> = {
   unconfigured: "Registration isn't switched on yet. Check back shortly.",
@@ -33,6 +33,70 @@ const STATUS_COPY = {
   },
 } as const;
 
+function EditNameRow({
+  character,
+  invalid,
+}: {
+  character: Character;
+  invalid?: string;
+}) {
+  return (
+    <li className="border-b border-stone-800/70 py-3 last:border-0">
+      <form
+        action={renameCharacter.bind(null, character.id)}
+        className="flex flex-wrap items-end gap-3"
+      >
+        <div>
+          <label className="label" htmlFor={`name-${character.id}`}>
+            Name
+          </label>
+          <input
+            id={`name-${character.id}`}
+            name="name"
+            className="field !w-40"
+            defaultValue={character.name}
+            required
+            minLength={2}
+            maxLength={24}
+            autoComplete="off"
+            autoFocus
+          />
+        </div>
+        <div>
+          <label className="label" htmlFor={`surname-${character.id}`}>
+            Surname
+          </label>
+          <input
+            id={`surname-${character.id}`}
+            name="surname"
+            className="field !w-40"
+            defaultValue={character.surname ?? ""}
+            maxLength={24}
+            autoComplete="off"
+          />
+        </div>
+        <button type="submit" className="btn btn-ember !py-2 !text-xs">
+          Save
+        </button>
+        <Link
+          href="/join"
+          className="pb-2 text-xs text-stone-500 underline-offset-2 hover:text-stone-200 hover:underline"
+        >
+          Cancel
+        </Link>
+      </form>
+
+      {invalid && (
+        <p className="mt-2 text-xs text-red-300">
+          {invalid === "save"
+            ? "Couldn't save that. Please try again."
+            : "Name must be 2 to 24 characters, surname 24 or fewer."}
+        </p>
+      )}
+    </li>
+  );
+}
+
 function CharacterRow({ character }: { character: Character }) {
   return (
     <li className="flex flex-wrap items-center gap-3 border-b border-stone-800/70 py-3 last:border-0">
@@ -56,6 +120,12 @@ function CharacterRow({ character }: { character: Character }) {
       )}
 
       <span className="ml-auto flex items-center gap-3 text-xs">
+        <Link
+          href={`/join?edit=${character.id}`}
+          className="text-stone-400 underline-offset-2 transition-colors hover:text-amber-200 hover:underline"
+        >
+          Edit
+        </Link>
         {!character.is_main && (
           <form action={setMainCharacter.bind(null, character.id)}>
             <button
@@ -82,9 +152,9 @@ function CharacterRow({ character }: { character: Character }) {
 export default async function JoinBody({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; edit?: string; invalid?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, edit, invalid } = await searchParams;
   const user = await getUser();
   const member = user ? await getMember() : null;
   const characters = member ? await getMyCharacters() : [];
@@ -170,7 +240,11 @@ export default async function JoinBody({
               <h2 className="label">Main</h2>
               <ul className="mt-1">
                 {main ? (
-                  <CharacterRow character={main} />
+                  main.id === edit ? (
+                    <EditNameRow character={main} invalid={invalid} />
+                  ) : (
+                    <CharacterRow character={main} />
+                  )
                 ) : (
                   <li className="py-3 text-sm text-stone-500">No main set.</li>
                 )}
@@ -180,9 +254,13 @@ export default async function JoinBody({
                 <>
                   <h2 className="label mt-6">Alts</h2>
                   <ul className="mt-1">
-                    {alts.map((c) => (
-                      <CharacterRow key={c.id} character={c} />
-                    ))}
+                    {alts.map((c) =>
+                      c.id === edit ? (
+                        <EditNameRow key={c.id} character={c} invalid={invalid} />
+                      ) : (
+                        <CharacterRow key={c.id} character={c} />
+                      ),
+                    )}
                   </ul>
                 </>
               )}

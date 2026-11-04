@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMember } from "@/lib/dal";
 import {
@@ -76,6 +77,44 @@ export async function addCharacter(
 
   refresh();
   return { ok: true, savedAt: Date.now() };
+}
+
+/**
+ * Fixing a typo in a name, without having to delete the character and lose
+ * its main flag. Class and role are not editable: a mis-picked class is
+ * better fixed by removing the character, since nothing is lost.
+ */
+export async function renameCharacter(
+  characterId: string,
+  formData: FormData,
+) {
+  const member = await getMember();
+  if (!member) return;
+
+  const name = String(formData.get("name") ?? "").trim();
+  const surname = String(formData.get("surname") ?? "").trim();
+
+  // Mirrors the table's CHECK constraints, so a bad value is reported back
+  // rather than rejected by the database.
+  if (name.length < 2 || name.length > 24 || surname.length > 24) {
+    redirect(`/join?edit=${characterId}&invalid=name`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("characters")
+    .update({ name, surname: surname || null })
+    .eq("id", characterId)
+    .eq("member_id", member.id);
+
+  if (error) {
+    console.error("[renameCharacter]", error.message);
+    redirect(`/join?edit=${characterId}&invalid=save`);
+  }
+
+  refresh();
+  // Drops the ?edit parameter so the row returns to its normal state.
+  redirect("/join");
 }
 
 export async function setMainCharacter(characterId: string) {
