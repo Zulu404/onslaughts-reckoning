@@ -5,7 +5,8 @@ import { authConfigured } from "@/lib/supabase/config";
 import { signInWithDiscord } from "@/app/auth/actions";
 import { DISCORD_INVITE } from "@/components/DiscordLink";
 import CharacterForm from "./CharacterForm";
-import { deleteCharacter, renameCharacter, setMainCharacter } from "./actions";
+import { getClass } from "@/lib/wow";
+import { deleteCharacter, setMainCharacter, updateCharacter } from "./actions";
 
 const ERRORS: Record<string, string> = {
   unconfigured: "Registration isn't switched on yet. Check back shortly.",
@@ -33,17 +34,21 @@ const STATUS_COPY = {
   },
 } as const;
 
-function EditNameRow({
+function EditCharacterRow({
   character,
   invalid,
 }: {
   character: Character;
   invalid?: string;
 }) {
+  // Roles come from the class, so a Warlock is never offered Tank. A class
+  // with a single role still renders the field, which shows why it can't move.
+  const roles = getClass(character.class)?.roles ?? [];
+
   return (
     <li className="border-b border-stone-800/70 py-3 last:border-0">
       <form
-        action={renameCharacter.bind(null, character.id)}
+        action={updateCharacter.bind(null, character.id)}
         className="flex flex-wrap items-end gap-3"
       >
         <div>
@@ -75,6 +80,24 @@ function EditNameRow({
             autoComplete="off"
           />
         </div>
+        <div>
+          <label className="label" htmlFor={`role-${character.id}`}>
+            Role
+          </label>
+          <select
+            id={`role-${character.id}`}
+            name="role"
+            className="field !w-32"
+            defaultValue={character.role}
+            required
+          >
+            {roles.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </div>
         <button type="submit" className="btn btn-ember !py-2 !text-xs">
           Save
         </button>
@@ -86,11 +109,18 @@ function EditNameRow({
         </Link>
       </form>
 
+      <p className="mt-2 text-xs text-stone-500">
+        {character.class} can&apos;t be changed here. Roll a new character if
+        you picked the wrong one.
+      </p>
+
       {invalid && (
         <p className="mt-2 text-xs text-red-300">
           {invalid === "save"
             ? "Couldn't save that. Please try again."
-            : "Name must be 2 to 24 characters, surname 24 or fewer."}
+            : invalid === "role"
+              ? `Pick a role a ${character.class} can actually fill.`
+              : "Name must be 2 to 24 characters, surname 24 or fewer."}
         </p>
       )}
     </li>
@@ -241,7 +271,7 @@ export default async function JoinBody({
               <ul className="mt-1">
                 {main ? (
                   main.id === edit ? (
-                    <EditNameRow character={main} invalid={invalid} />
+                    <EditCharacterRow character={main} invalid={invalid} />
                   ) : (
                     <CharacterRow character={main} />
                   )
@@ -256,7 +286,7 @@ export default async function JoinBody({
                   <ul className="mt-1">
                     {alts.map((c) =>
                       c.id === edit ? (
-                        <EditNameRow key={c.id} character={c} invalid={invalid} />
+                        <EditCharacterRow key={c.id} character={c} invalid={invalid} />
                       ) : (
                         <CharacterRow key={c.id} character={c} />
                       ),

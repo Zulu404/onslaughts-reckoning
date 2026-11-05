@@ -80,11 +80,11 @@ export async function addCharacter(
 }
 
 /**
- * Fixing a typo in a name, without having to delete the character and lose
- * its main flag. Class and role are not editable: a mis-picked class is
- * better fixed by removing the character, since nothing is lost.
+ * Fixing a misspelt name or a changed role, without having to delete the
+ * character and lose its main flag. Class stays fixed: it decides which roles
+ * are even offered, and re-rolling a class means a new character anyway.
  */
-export async function renameCharacter(
+export async function updateCharacter(
   characterId: string,
   formData: FormData,
 ) {
@@ -93,6 +93,7 @@ export async function renameCharacter(
 
   const name = String(formData.get("name") ?? "").trim();
   const surname = String(formData.get("surname") ?? "").trim();
+  const role = String(formData.get("role") ?? "");
 
   // Mirrors the table's CHECK constraints, so a bad value is reported back
   // rather than rejected by the database.
@@ -101,14 +102,33 @@ export async function renameCharacter(
   }
 
   const supabase = await createClient();
+
+  // The class is needed to check the role, and reading it scoped to this
+  // member also confirms the character is theirs before anything is written.
+  const { data: existing, error: readError } = await supabase
+    .from("characters")
+    .select("class")
+    .eq("id", characterId)
+    .eq("member_id", member.id)
+    .maybeSingle();
+
+  if (readError || !existing) {
+    if (readError) console.error("[updateCharacter] read", readError.message);
+    redirect(`/join?edit=${characterId}&invalid=save`);
+  }
+
+  if (!isValidRole(role) || !classCanFillRole(existing.class, role)) {
+    redirect(`/join?edit=${characterId}&invalid=role`);
+  }
+
   const { error } = await supabase
     .from("characters")
-    .update({ name, surname: surname || null })
+    .update({ name, surname: surname || null, role })
     .eq("id", characterId)
     .eq("member_id", member.id);
 
   if (error) {
-    console.error("[renameCharacter]", error.message);
+    console.error("[updateCharacter]", error.message);
     redirect(`/join?edit=${characterId}&invalid=save`);
   }
 
